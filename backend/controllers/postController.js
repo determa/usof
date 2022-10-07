@@ -1,6 +1,5 @@
-const { Post, Category, PostCategory } = require("../models/models");
+const { Post, Category, Comment } = require("../models/models");
 const ApiError = require("../error/ApiError");
-const { getAllPosts } = require("./categoryController");
 
 class PostController {
     async create(req, res, next) {
@@ -96,6 +95,44 @@ class PostController {
             const post = await Post.destroy({ where: { id } });
             if (!post) return next(ApiError.badRequest("Post not found"));
             return res.json({ message: "Post delete" });
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
+    }
+
+    async getAllComment(req, res, next) {
+        try {
+            let { id } = req.params;
+            let { limit, page } = req.query;
+            page = page || 1;
+            limit = limit || 10;
+            let offset = page * limit - limit;
+
+            const post = await Post.findAll({
+                limit,
+                offset,
+                include: { model: Comment },
+                where: { id },
+            });
+            return res.json(post[0].comments);
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
+    }
+
+    async createComment(req, res, next) {
+        try {
+            let { id } = req.params;
+            const { content } = req.body;
+            if (!content) return next(ApiError.badRequest("Content is null"));
+
+            let comment = await Comment.create({
+                content,
+                userId: req.user.id,
+                postId: id,
+            });
+
+            return res.json(comment);
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }

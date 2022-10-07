@@ -1,6 +1,5 @@
 const { Category, Post } = require("../models/models");
 const ApiError = require("../error/ApiError");
-const { Op } = require("sequelize");
 
 class CategoryController {
     async create(req, res, next) {
