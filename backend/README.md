@@ -9,7 +9,10 @@ NodeJS
     </a>
 </p>
 
-<p>
+<!-- <p>
     Task:
-    <img src="usof_backend.pdf" alt="nodejs" width="50" height="50"/>
-</p>
+    <object>
+    <img src="usof_backend.pdf" alt="pdf" width="50" height="50"/>
+</p> -->
+Task:
+[usof_backend.pdf](usof_backend.pdf)
