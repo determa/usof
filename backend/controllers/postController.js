@@ -10,7 +10,11 @@ class PostController {
             if (!title || !content || !categories)
                 return next(ApiError.badRequest("Incorrect data!"));
 
-            let post = await Post.create({ title, content });
+            let post = await Post.create({
+                title,
+                content,
+                userId: req.user.id,
+            });
             const db_categories = await Category.findAll({
                 where: { id: categories },
             });
@@ -70,19 +74,17 @@ class PostController {
     async patch(req, res, next) {
         try {
             let { id } = req.params;
-            const { title } = req.body;
-            let description;
+            const { title, content, categories } = req.body;
 
-            if (req.body.description) description = req.body.description;
-
-            if (!title) return next(ApiError.badRequest("Incorrect data!"));
-            const category = await Category.update(
-                { title, description },
-                { where: { id } }
-            );
-            if (!category)
-                return next(ApiError.badRequest("Category not found"));
-            return res.json({ message: "complete" });
+            await Post.update({ title, content }, { where: { id } });
+            const post = await Post.findOne({ where: { id } });
+            if (req.user.id !== post.userId)
+                return next(ApiError.forbidden("Access is denied"));
+            const db_categories = await Category.findAll({
+                where: { id: categories },
+            });
+            const post_category = await post.setCategories(db_categories);
+            return res.json(post);
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }

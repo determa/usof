@@ -40,7 +40,14 @@ class CategoryController {
     async getAllPosts(req, res, next) {
         try {
             let { id } = req.params;
+            let { limit, page } = req.query;
+            page = page || 1;
+            limit = limit || 10;
+            let offset = page * limit - limit;
+
             const posts = await Post.findAll({
+                limit,
+                offset,
                 include: {
                     model: Category,
                     where: { id },

@@ -25,7 +25,11 @@ const Post = sequelize.define("post", {
 const Category = sequelize.define("category", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     title: { type: DataTypes.STRING, allowNull: false },
-    description: { type: DataTypes.STRING, allowNull: false, defaultValue: "-" },
+    description: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "-",
+    },
 });
 
 const Comment = sequelize.define("comment", {
