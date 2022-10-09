@@ -17,7 +17,6 @@ const User = sequelize.define("user", {
 const Post = sequelize.define("post", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     title: { type: DataTypes.STRING, allowNull: false },
-    publish_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     status: { type: DataTypes.BOOLEAN, defaultValue: true },
     content: { type: DataTypes.TEXT, allowNull: false },
 });
@@ -34,19 +33,16 @@ const Category = sequelize.define("category", {
 
 const Comment = sequelize.define("comment", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    publish_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     content: { type: DataTypes.STRING, allowNull: false },
 });
 
 const PostLike = sequelize.define("post_like", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    publish_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     type: { type: DataTypes.ENUM("LIKE", "DISLIKE") },
 });
 
 const CommentLike = sequelize.define("comment_like", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    publish_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     type: { type: DataTypes.ENUM("LIKE", "DISLIKE") },
 });
 

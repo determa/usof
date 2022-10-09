@@ -1,4 +1,4 @@
-const { Post, Category, Comment } = require("../models/models");
+const { Post, Category, Comment, PostLike } = require("../models/models");
 const ApiError = require("../error/ApiError");
 
 class PostController {
@@ -133,6 +133,64 @@ class PostController {
             });
 
             return res.json(comment);
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
+    }
+
+    async addLike(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { type } = req.body;
+            let post = await Post.findOne({ where: { id } });
+            if (!post) return next(ApiError.badRequest("Post not found"));
+
+            let like = await PostLike.findOne({
+                where: { userId: req.user.id, postId: id },
+            });
+            if (!like) {
+                let result = await PostLike.create({
+                    type,
+                    postId: id,
+                    userId: req.user.id,
+                });
+                return res.json(result);
+            }
+            let result = await PostLike.update(
+                { type },
+                { where: { userId: req.user.id, postId: id } }
+            );
+            if (!result[0]) return next(ApiError.badRequest("Like not update"));
+            return res.json({ message: "Like changed" });
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
+    }
+
+    async getAllLikes(req, res, next) {
+        try {
+            const { id } = req.params;
+            let post = await Post.findOne({ where: { id } });
+            if (!post) return next(ApiError.badRequest("Post not found"));
+
+            const like = await Post.findAll({
+                where: { id },
+                include: { model: PostLike },
+            });
+            return res.json(like[0].post_likes);
+        } catch (e) {
+            next(ApiError.badRequest(e.message));
+        }
+    }
+
+    async deleteLike(req, res, next) {
+        try {
+            const { id } = req.params;
+            const like = await PostLike.destroy({
+                where: { userId: req.user.id, postId: id },
+            });
+            if (!like) return next(ApiError.badRequest("Like not found"));
+            return res.json({ message: "Like delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }
