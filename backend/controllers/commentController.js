@@ -22,8 +22,8 @@ class CommentController {
                 { content },
                 { where: { id } }
             );
-            if (!comment)
-                return next(ApiError.notFound("Category not found"));
+            if (!comment[0])
+                return next(ApiError.notFound("Comment not found"));
             return res.json({ message: "complete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -35,8 +35,8 @@ class CommentController {
             let { id } = req.params;
             const comment = await Comment.destroy({ where: { id } });
             if (!comment)
-                return next(ApiError.notFound("Category not found"));
-            return res.json({ message: "Category delete" });
+                return next(ApiError.notFound("Comment not found"));
+            return res.json({ message: "Comment delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }
@@ -93,7 +93,7 @@ class CommentController {
             const like = await CommentLike.destroy({
                 where: { userId: req.user.id, commentId: id },
             });
-            if (!like) return next(ApiError.notFound("Like not found"));
+            if (!like) return next(ApiError.notFound("Comment or like not found"));
             return res.json({ message: "Like delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));

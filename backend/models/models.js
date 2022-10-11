@@ -34,6 +34,7 @@ const Category = sequelize.define("category", {
 const Comment = sequelize.define("comment", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     content: { type: DataTypes.STRING, allowNull: false },
+    status: { type: DataTypes.BOOLEAN, defaultValue: true },
 });
 
 const PostLike = sequelize.define("post_like", {

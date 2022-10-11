@@ -17,6 +17,8 @@ class PostController {
             const db_categories = await Category.findAll({
                 where: { id: categories },
             });
+            if (!db_categories[0])
+                return next(ApiError.notFound("Category not found!"));
             const post_category = await post.addCategory(db_categories);
 
             return res.json(post);
@@ -64,6 +66,7 @@ class PostController {
                 where: { id },
                 include: { model: Category },
             });
+            if (!post) return next(ApiError.notFound("Post not found"));
             return res.json(post.categories);
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -77,11 +80,12 @@ class PostController {
 
             await Post.update({ title, content }, { where: { id } });
             const post = await Post.findOne({ where: { id } });
-            if (req.user.id !== post.userId)
-                return next(ApiError.forbidden());
+            if (req.user.id !== post.userId) return next(ApiError.forbidden());
             const db_categories = await Category.findAll({
                 where: { id: categories },
             });
+            if (!db_categories[0])
+                return next(ApiError.notFound("Category not found!"));
             const post_category = await post.setCategories(db_categories);
             return res.json(post);
         } catch (e) {
@@ -114,6 +118,7 @@ class PostController {
                 include: { model: Comment },
                 where: { id },
             });
+            if (!post[0]) return next(ApiError.notFound("Post not found"));
             return res.json(post[0].comments);
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -126,12 +131,14 @@ class PostController {
             const { content } = req.body;
             if (!content) return next(ApiError.badRequest("Content is null"));
 
+            const post = await Post.findOne({ where: { id } });
+            if (!post) return next(ApiError.notFound("Post not found"));
             let comment = await Comment.create({
                 content,
                 userId: req.user.id,
                 postId: id,
             });
-
+            if (!comment) return next(ApiError.badRequest("comment not add"));
             return res.json(comment);
         } catch (e) {
             next(ApiError.badRequest(e.message));
