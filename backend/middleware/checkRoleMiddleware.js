@@ -1,4 +1,5 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const ApiError = require("../error/ApiError");
 
 module.exports = (role) => {
     return (req, res, next) => {
@@ -10,16 +11,16 @@ module.exports = (role) => {
             const token = req.cookies.token;
             // const token = req.headers.authorization.split(' ')[1]; //bearer token
             if (!token) {
-                return res.status(401).json({ message: "Not authorized" });
+                return next(ApiError.notAuth());
             }
             const decoded = jwt.verify(token, process.env.SECRET_KEY);
             if (decoded.role !== role) {
-                return res.status(403).json({ message: "No access" });
+                return next(ApiError.forbidden());
             }
             req.user = decoded;
             next();
         } catch (e) {
-            res.status(401).json({ message: "Not authorized" });
+            return next(ApiError.notAuth());
         }
-    }
-}
+    };
+};

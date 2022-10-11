@@ -32,7 +32,7 @@ class AuthController {
             return next(ApiError.badRequest("Data incorrect"));
 
         const user = await User.findOne({ where: { login, email } });
-        if (!user) return next(ApiError.badRequest("User is not found"));
+        if (!user) return next(ApiError.notFound("User is not found"));
 
         if (!bcrypt.compareSync(password, user.password))
             return next(ApiError.badRequest("Invalid password!"));
@@ -73,7 +73,7 @@ class AuthController {
         if (!email) return next(ApiError.badRequest("Incorrect data"));
 
         const user = await User.findOne({ where: { email } });
-        if (!user) return next(ApiError.badRequest("User is not found"));
+        if (!user) return next(ApiError.notFound("User is not found"));
 
         const token = tokenService.generateJWT(user.id, user.login, user.role);
 

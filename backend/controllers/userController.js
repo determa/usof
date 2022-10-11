@@ -2,7 +2,6 @@ const ApiError = require("../error/ApiError");
 const { User } = require("../models/models");
 const uuid = require("uuid");
 const path = require("path");
-const { validateJWT } = require("../service/tokenService");
 
 class UserController {
     async getAll(req, res) {
@@ -43,7 +42,7 @@ class UserController {
                     { picture: fileName },
                     { where: { id: req.user.id } }
                 );
-                if (!avatar) return next(ApiError.badRequest("User not found"));
+                if (!avatar) return next(ApiError.notFound("User not found"));
             }
             img.mv(path.resolve(__dirname, "..", "static", fileName));
             return res.json({ message: "complete" });
@@ -62,7 +61,7 @@ class UserController {
                 { login, email, full_name, role },
                 { where: { id } }
             );
-            if (!user) return next(ApiError.badRequest("User not found"));
+            if (!user) return next(ApiError.notFound("User not found"));
             return res.json({ message: "complete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -73,7 +72,7 @@ class UserController {
         try {
             let { id } = req.params;
             const user = await User.destroy({ where: { id } });
-            if (!user) return next(ApiError.badRequest("User not found"));
+            if (!user) return next(ApiError.notFound("User not found"));
             return res.json({ message: "User delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));

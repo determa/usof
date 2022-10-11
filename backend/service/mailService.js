@@ -14,6 +14,8 @@ class MailService {
     }
 
     async sendActivationMail(to, token) {
+        const link = `http://${process.env.HOST}:${process.env.PORT}/api/auth/email-confirm/${token}`;
+
         await this.transporter.sendMail({
             from: process.env.SMTP_USER,
             to,
@@ -22,14 +24,14 @@ class MailService {
             html: `
                     <div>
                         <h1>Activation link:</h1>
-                        <a href="http://${process.env.HOST}:${process.env.PORT}/api/auth/email-confirm/${token}" target="_blank">click to confirm</a>
+                        <a href="${link}" target="_blank">${link}</a>
                     </div>
                 `,
         });
     }
 
     async sendResetPass(to, token) {
-        const link = `http://${process.env.HOST}:${process.env.PORT}/api/auth/password-reset/${token}`
+        const link = `http://${process.env.HOST}:${process.env.PORT}/api/auth/password-reset/${token}`;
         await this.transporter.sendMail({
             from: process.env.SMTP_USER,
             to,

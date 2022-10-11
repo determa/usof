@@ -23,7 +23,7 @@ class CommentController {
                 { where: { id } }
             );
             if (!comment)
-                return next(ApiError.badRequest("Category not found"));
+                return next(ApiError.notFound("Category not found"));
             return res.json({ message: "complete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -35,7 +35,7 @@ class CommentController {
             let { id } = req.params;
             const comment = await Comment.destroy({ where: { id } });
             if (!comment)
-                return next(ApiError.badRequest("Category not found"));
+                return next(ApiError.notFound("Category not found"));
             return res.json({ message: "Category delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -47,7 +47,7 @@ class CommentController {
             const { id } = req.params;
             const { type } = req.body;
             let comment = await Comment.findOne({ where: { id } });
-            if (!comment) return next(ApiError.badRequest("Comment not found"));
+            if (!comment) return next(ApiError.notFound("Comment not found"));
 
             let like = await CommentLike.findOne({
                 where: { userId: req.user.id, commentId: id },
@@ -75,7 +75,7 @@ class CommentController {
         try {
             const { id } = req.params;
             let comment = await Comment.findOne({ where: { id } });
-            if (!comment) return next(ApiError.badRequest("Comment not found"));
+            if (!comment) return next(ApiError.notFound("Comment not found"));
 
             const like = await Comment.findAll({
                 where: { id },
@@ -93,7 +93,7 @@ class CommentController {
             const like = await CommentLike.destroy({
                 where: { userId: req.user.id, commentId: id },
             });
-            if (!like) return next(ApiError.badRequest("Like not found"));
+            if (!like) return next(ApiError.notFound("Like not found"));
             return res.json({ message: "Like delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));

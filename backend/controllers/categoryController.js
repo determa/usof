@@ -82,7 +82,7 @@ class CategoryController {
                 { where: { id } }
             );
             if (!category)
-                return next(ApiError.badRequest("Category not found"));
+                return next(ApiError.notFound("Category not found"));
             return res.json({ message: "complete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -94,7 +94,7 @@ class CategoryController {
             let { id } = req.params;
             const category = await Category.destroy({ where: { id } });
             if (!category)
-                return next(ApiError.badRequest("Category not found"));
+                return next(ApiError.notFound("Category not found"));
             return res.json({ message: "Category delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
