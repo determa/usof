@@ -1,5 +1,6 @@
 const { Post, Category, Comment, PostLike } = require("../models/models");
 const ApiError = require("../error/ApiError");
+const { Op, literal } = require("sequelize");
 
 class PostController {
     async create(req, res, next) {
@@ -29,17 +30,98 @@ class PostController {
 
     async getAll(req, res, next) {
         try {
-            let { limit, page } = req.query;
+            let { limit, page, categories, startDate, endDate, status, sort } =
+                req.query;
+
             page = page || 1;
             limit = limit || 10;
             let offset = page * limit - limit;
 
+            let catObj = { where: {} };
+            let postObj = {};
+            // if (req.user.role == "GUEST") {
+            //     if (status == false) {
+            //         console.log("111_", req.user.role);
+            //         return res.json({});
+            //     } else {
+            //         console.log("111", req.user.role);
+            //         postObj = { status: true };
+            //     }
+            // }
+            // if (req.user.role == "USER") {
+            //     if (status == false) {
+            //         // status: status,
+            //         console.log("222_", req.user.role);
+            //         postObj = { userId: req.user.id, status: false };
+            //     } else {
+            //         console.log("222", req.user.role);
+            //         postObj = {
+            //             status: status,
+            //             include: {
+            //                 [Op.and]: [
+            //                     { userId: req.user.id },
+            //                     { status: false },
+            //                 ],
+            //             },
+            //         };
+            //     }
+            // }
+            // if (req.user.role == "ADMIN") {
+            //     if (status == true) {
+            //         console.log("333", req.user.role);
+            //         postObj = {
+            //             [Op.and]: [
+            //                 { userId: req.user.id, status: false },
+            //                 { status: status },
+            //             ],
+            //         };
+            //     } else {
+            //         console.log("333_", req.user.role);
+            //         postObj = { status };
+            //     }
+            // }
+
+            if (categories) catObj.where.id = categories.split(",");
+
+            if (startDate) startDate = new Date(startDate);
+            if (endDate)
+                endDate = new Date(endDate).getTime() + 24 * 60 * 60 * 1000 - 1; //до конца дня
+
+            if (startDate && endDate)
+                postObj.createdAt = { [Op.gte]: startDate, [Op.lte]: endDate };
+            if (!startDate && endDate)
+                postObj.createdAt = { [Op.lte]: endDate };
+            if (startDate && !endDate)
+                postObj.createdAt = { [Op.gte]: startDate };
+
+            let sortArr = [[literal("countlike"), "DESC"]];
+            if (sort === "-like") sortArr = [[literal("countlike"), "ASC"]];
+            if (sort === "date") sortArr = [['"createdAt"', "DESC"]];
+            if (sort === "-date") sortArr = [['"createdAt"', "ASC"]];
+
             const post = await Post.findAndCountAll({
                 limit,
                 offset,
-                include: { model: Category },
+                where: postObj,
+                include: [{ model: Category, catObj }],
+                attributes: {
+                    include: [
+                        [
+                            literal(
+                                `(SELECT COUNT(*) FROM post_likes WHERE "postId" = post.id AND type = 'LIKE')`
+                            ),
+                            "countlike",
+                        ],
+                        [
+                            literal(
+                                `(SELECT COUNT(*) FROM post_likes WHERE "postId" = post.id AND type = 'DISLIKE')`
+                            ),
+                            "countdislike",
+                        ],
+                    ],
+                },
+                order: sortArr,
             });
-
             return res.json(post);
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -76,9 +158,9 @@ class PostController {
     async patch(req, res, next) {
         try {
             let { id } = req.params;
-            const { title, content, categories } = req.body;
+            const { title, content, categories, status } = req.body;
 
-            await Post.update({ title, content }, { where: { id } });
+            await Post.update({ title, content, status }, { where: { id } });
             const post = await Post.findOne({ where: { id } });
             if (req.user.id !== post.userId) return next(ApiError.forbidden());
             const db_categories = await Category.findAll({

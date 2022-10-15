@@ -1,9 +1,10 @@
 const Router = require("express");
 const postController = require("../controllers/postController");
 const authMiddleware = require("../middleware/authMiddleware");
+const checkRole = require("../middleware/checkRole");
 const router = new Router();
 
-router.get("/", postController.getAll);
+router.get("/", checkRole, postController.getAll);
 router.get("/:id", postController.getOne);
 router.get("/:id/categories", postController.getOneCategories);
 router.get("/:id/comments", postController.getAllComment);
