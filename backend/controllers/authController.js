@@ -54,7 +54,7 @@ class AuthController {
             res.clearCookie("token");
             return res.json({ message: "Success" });
         } catch (e) {
-            next(e);
+            next(ApiError.badRequest(e));
         }
     }
 
