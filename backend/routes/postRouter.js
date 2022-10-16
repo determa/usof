@@ -5,7 +5,7 @@ const checkRole = require("../middleware/checkRole");
 const router = new Router();
 
 router.get("/", checkRole, postController.getAll);
-router.get("/:id", postController.getOne);
+router.get("/:id", checkRole, postController.getOne);
 router.get("/:id/categories", postController.getOneCategories);
 router.get("/:id/comments", postController.getAllComment);
 router.get("/:id/like", postController.getAllLikes);

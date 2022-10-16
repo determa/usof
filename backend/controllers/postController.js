@@ -115,6 +115,11 @@ class PostController {
                 where: { id },
                 include: { model: Category },
             });
+            if (post.status == false) {
+                if (req.user.id != post.userId && req.user.role != "ADMIN") {
+                    return next(ApiError.forbidden());
+                }
+            }
             return res.json(post);
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -138,18 +143,29 @@ class PostController {
     async patch(req, res, next) {
         try {
             let { id } = req.params;
-            const { title, content, categories, status } = req.body;
+            const { content, categories, status } = req.body;
 
-            await Post.update({ title, content, status }, { where: { id } });
             const post = await Post.findOne({ where: { id } });
-            if (req.user.id !== post.userId) return next(ApiError.forbidden());
+            if (!post) return next(ApiError.notFound("Post not found!"));
+
+            if (req.user.id != post.userId && req.user.role != "ADMIN") {
+                return next(ApiError.forbidden());
+            }
+
+            let data = {};
+            if (content && req.user.id == post.userId) data.content = content;
+            if (status != undefined && req.user.role == "ADMIN")
+                data.status = status;
+            await Post.update(data, { where: { id } });
+
             const db_categories = await Category.findAll({
                 where: { id: categories },
             });
             if (!db_categories[0])
                 return next(ApiError.notFound("Category not found!"));
-            const post_category = await post.setCategories(db_categories);
-            return res.json(post);
+            await post.setCategories(db_categories);
+
+            return res.json({ message: "Post update!" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
         }
@@ -158,8 +174,16 @@ class PostController {
     async delete(req, res, next) {
         try {
             let { id } = req.params;
-            const post = await Post.destroy({ where: { id } });
-            if (!post) return next(ApiError.notFound("Post not found"));
+
+            const post = await Post.findOne({ where: { id } });
+            if (!post) return next(ApiError.notFound("Post not found!"));
+
+            if (req.user.id != post.userId && req.user.role != "ADMIN") {
+                return next(ApiError.forbidden());
+            }
+
+            const delPpost = await Post.destroy({ where: { id } });
+            if (!delPpost) return next(ApiError.notFound("Post not found"));
             return res.json({ message: "Post delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
