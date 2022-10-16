@@ -1,5 +1,6 @@
 const { Comment, CommentLike } = require("../models/models");
 const ApiError = require("../error/ApiError");
+const ratingService = require("../service/ratingService");
 
 class CommentController {
     async getOne(req, res, next) {
@@ -34,8 +35,7 @@ class CommentController {
         try {
             let { id } = req.params;
             const comment = await Comment.destroy({ where: { id } });
-            if (!comment)
-                return next(ApiError.notFound("Comment not found"));
+            if (!comment) return next(ApiError.notFound("Comment not found"));
             return res.json({ message: "Comment delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -58,13 +58,18 @@ class CommentController {
                     commentId: id,
                     userId: req.user.id,
                 });
+                await ratingService(type, comment.userId);
                 return res.json(result);
             }
-            let result = await CommentLike.update(
-                { type },
-                { where: { userId: req.user.id, commentId: id } }
-            );
-            if (!result[0]) return next(ApiError.badRequest("Like not update"));
+            if (like.type != type) {
+                let result = await CommentLike.update(
+                    { type },
+                    { where: { userId: req.user.id, commentId: id } }
+                );
+                if (!result[0])
+                    return next(ApiError.badRequest("Like not update"));
+                await ratingService(type, comment.userId, 2);
+            }
             return res.json({ message: "Like changed" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -90,10 +95,16 @@ class CommentController {
     async deleteLike(req, res, next) {
         try {
             const { id } = req.params;
-            const like = await CommentLike.destroy({
+            const comment = await Comment.findOne({ where: { id: id } });
+            const like = await CommentLike.findOne({
                 where: { userId: req.user.id, commentId: id },
             });
-            if (!like) return next(ApiError.notFound("Comment or like not found"));
+            const delLike = await CommentLike.destroy({
+                where: { userId: req.user.id, commentId: id },
+            });
+            if (!delLike)
+                return next(ApiError.notFound("Comment or like not found"));
+            await ratingService(like.type, comment.userId, -1);
             return res.json({ message: "Like delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));

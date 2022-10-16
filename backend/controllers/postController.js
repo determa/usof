@@ -1,6 +1,7 @@
 const { Post, Category, Comment, PostLike } = require("../models/models");
 const ApiError = require("../error/ApiError");
 const { Op, literal } = require("sequelize");
+const ratingService = require("../service/ratingService");
 
 class PostController {
     async create(req, res, next) {
@@ -39,47 +40,24 @@ class PostController {
 
             let catObj = { where: {} };
             let postObj = {};
-            // if (req.user.role == "GUEST") {
-            //     if (status == false) {
-            //         console.log("111_", req.user.role);
-            //         return res.json({});
-            //     } else {
-            //         console.log("111", req.user.role);
-            //         postObj = { status: true };
-            //     }
-            // }
-            // if (req.user.role == "USER") {
-            //     if (status == false) {
-            //         // status: status,
-            //         console.log("222_", req.user.role);
-            //         postObj = { userId: req.user.id, status: false };
-            //     } else {
-            //         console.log("222", req.user.role);
-            //         postObj = {
-            //             status: status,
-            //             include: {
-            //                 [Op.and]: [
-            //                     { userId: req.user.id },
-            //                     { status: false },
-            //                 ],
-            //             },
-            //         };
-            //     }
-            // }
-            // if (req.user.role == "ADMIN") {
-            //     if (status == true) {
-            //         console.log("333", req.user.role);
-            //         postObj = {
-            //             [Op.and]: [
-            //                 { userId: req.user.id, status: false },
-            //                 { status: status },
-            //             ],
-            //         };
-            //     } else {
-            //         console.log("333_", req.user.role);
-            //         postObj = { status };
-            //     }
-            // }
+            if (status) postObj = { status };
+            if (req.user) {
+                //права доступа + status
+                if (req.user.role == "USER") {
+                    if (status == undefined) {
+                        postObj = {
+                            [Op.or]: [
+                                { userId: req.user.id },
+                                { status: true },
+                            ],
+                        };
+                    }
+                    if (status == false)
+                        postObj = { userId: req.user.id, status };
+                }
+            } else {
+                postObj = { status: true };
+            }
 
             if (categories) catObj.where.id = categories.split(",");
 
@@ -98,6 +76,8 @@ class PostController {
             if (sort === "-like") sortArr = [[literal("countlike"), "ASC"]];
             if (sort === "date") sortArr = [['"createdAt"', "DESC"]];
             if (sort === "-date") sortArr = [['"createdAt"', "ASC"]];
+            if (sort === "status") sortArr = [['"status"', "DESC"]];
+            if (sort === "-status") sortArr = [['"status"', "ASC"]];
 
             const post = await Post.findAndCountAll({
                 limit,
@@ -243,13 +223,18 @@ class PostController {
                     postId: id,
                     userId: req.user.id,
                 });
+                await ratingService(type, post.userId);
                 return res.json(result);
             }
-            let result = await PostLike.update(
-                { type },
-                { where: { userId: req.user.id, postId: id } }
-            );
-            if (!result[0]) return next(ApiError.badRequest("Like not update"));
+            if (like.type != type) {
+                let result = await PostLike.update(
+                    { type },
+                    { where: { userId: req.user.id, postId: id } }
+                );
+                if (!result[0])
+                    return next(ApiError.badRequest("Like not update"));
+                await ratingService(type, post.userId, 2);
+            }
             return res.json({ message: "Like changed" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -275,10 +260,16 @@ class PostController {
     async deleteLike(req, res, next) {
         try {
             const { id } = req.params;
-            const like = await PostLike.destroy({
+            const post = await Post.findOne({ where: { id: id } });
+            const like = await PostLike.findOne({
                 where: { userId: req.user.id, postId: id },
             });
-            if (!like) return next(ApiError.notFound("Like not found"));
+            const delLike = await PostLike.destroy({
+                where: { userId: req.user.id, postId: id },
+            });
+            if (!delLike) return next(ApiError.notFound("Like not found"));
+
+            await ratingService(like.type, post.userId, -1);
             return res.json({ message: "Like delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
