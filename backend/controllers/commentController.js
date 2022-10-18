@@ -16,15 +16,18 @@ class CommentController {
     async patch(req, res, next) {
         try {
             let { id } = req.params;
-            const { content } = req.body;
-            if (!content) return next(ApiError.badRequest("Content is null"));
+            const { status } = req.body;
+            if (!status) return next(ApiError.badRequest("Status is null"));
 
-            const comment = await Comment.update(
-                { content },
-                { where: { id } }
-            );
-            if (!comment[0])
-                return next(ApiError.notFound("Comment not found"));
+            const comment = await Comment.findOne({ where: { id } });
+            if (!comment) return next(ApiError.notFound("Comment not found!"));
+
+            if (req.user.id != comment.userId && req.user.role != "ADMIN") {
+                return next(ApiError.forbidden());
+            }
+
+            const upd = await Comment.update({ status }, { where: { id } });
+            if (!upd[0]) return next(ApiError.notFound("Comment not update"));
             return res.json({ message: "complete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -34,8 +37,17 @@ class CommentController {
     async delete(req, res, next) {
         try {
             let { id } = req.params;
-            const comment = await Comment.destroy({ where: { id } });
-            if (!comment) return next(ApiError.notFound("Comment not found"));
+
+            const comment = await Comment.findOne({ where: { id } });
+            if (!comment) return next(ApiError.notFound("Comment not found!"));
+
+            if (req.user.id != comment.userId && req.user.role != "ADMIN") {
+                return next(ApiError.forbidden());
+            }
+
+            const commentDel = await Comment.destroy({ where: { id } });
+            if (!commentDel)
+                return next(ApiError.notFound("Comment not found"));
             return res.json({ message: "Comment delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));

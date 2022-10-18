@@ -182,8 +182,8 @@ class PostController {
                 return next(ApiError.forbidden());
             }
 
-            const delPpost = await Post.destroy({ where: { id } });
-            if (!delPpost) return next(ApiError.notFound("Post not found"));
+            const delPost = await Post.destroy({ where: { id } });
+            if (!delPost) return next(ApiError.notFound("Post not found"));
             return res.json({ message: "Post delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));

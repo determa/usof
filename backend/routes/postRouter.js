@@ -7,7 +7,7 @@ const router = new Router();
 router.get("/", checkRole, postController.getAll);
 router.get("/:id", checkRole, postController.getOne);
 router.get("/:id/categories", postController.getOneCategories);
-router.get("/:id/comments", postController.getAllComment);
+router.get("/:id/comments", checkRole, postController.getAllComment);
 router.get("/:id/like", postController.getAllLikes);
 router.post("/", authMiddleware, postController.create);
 router.post("/:id/comments", authMiddleware, postController.createComment);
