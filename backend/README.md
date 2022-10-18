@@ -14,5 +14,8 @@ NodeJS
     <object>
     <img src="usof_backend.pdf" alt="pdf" width="50" height="50"/>
 </p> -->
+
 Task:
 [usof_backend.pdf](usof_backend.pdf)
+
+API in [postman_collection](usof.postman_collection.json)
