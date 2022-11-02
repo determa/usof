@@ -6,7 +6,7 @@ const ratingService = require("../service/ratingService");
 class PostController {
     async create(req, res, next) {
         try {
-            const { title, content, categories } = req.body;
+            let { title, content, categories } = req.body;
 
             if (!title || !content || !categories)
                 return next(ApiError.badRequest("Incorrect data!"));
@@ -143,7 +143,8 @@ class PostController {
     async patch(req, res, next) {
         try {
             let { id } = req.params;
-            const { content, categories, status } = req.body;
+            let { content, categories, status } = req.body;
+            categories = categories || 1;
 
             const post = await Post.findOne({ where: { id } });
             if (!post) return next(ApiError.notFound("Post not found!"));
@@ -156,6 +157,9 @@ class PostController {
             if (content && req.user.id == post.userId) data.content = content;
             if (status != undefined && req.user.role == "ADMIN")
                 data.status = status;
+
+            if (!data.content && !data.status)
+                return next(ApiError.forbidden());
             await Post.update(data, { where: { id } });
 
             const db_categories = await Category.findAll({

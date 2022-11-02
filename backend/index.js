@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || "localhost";
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.static(path.resolve(__dirname, "static")));
 app.use(fileUpload({}));

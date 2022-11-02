@@ -11,13 +11,16 @@ class CategoryController {
 
             if (!title) return next(ApiError.badRequest("Incorrect data!"));
 
-            const category = await Category.create({
+            const category = await Category.findOne({ where: { title } });
+            if (category) return next(ApiError.badRequest("Title exists"));
+
+            const resul = await Category.create({
                 title,
                 description,
             });
-            return res.json(category);
+            return res.json(resul);
         } catch (e) {
-            next(ApiError.badRequest(e.message));
+            return next(ApiError.badRequest(e.message));
         }
     }
 
@@ -81,8 +84,7 @@ class CategoryController {
                 { title, description },
                 { where: { id } }
             );
-            if (!category)
-                return next(ApiError.notFound("Category not found"));
+            if (!category) return next(ApiError.notFound("Category not found"));
             return res.json({ message: "complete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));
@@ -93,8 +95,7 @@ class CategoryController {
         try {
             let { id } = req.params;
             const category = await Category.destroy({ where: { id } });
-            if (!category)
-                return next(ApiError.notFound("Category not found"));
+            if (!category) return next(ApiError.notFound("Category not found"));
             return res.json({ message: "Category delete" });
         } catch (e) {
             next(ApiError.badRequest(e.message));

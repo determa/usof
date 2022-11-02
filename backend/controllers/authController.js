@@ -38,20 +38,32 @@ class AuthController {
             return next(ApiError.badRequest("Invalid password!"));
 
         const token = tokenService.generateJWT(user.id, user.login, user.role);
+        const tokenAccess = tokenService.generateAccess(
+            user.id,
+            user.login,
+            user.role
+        );
         if (!user.confirm) {
-            mailService.sendActivationMail(email, token);
+            mailService.sendActivationMail(email, tokenAccess);
             return next(ApiError.badRequest("Confirm email!"));
         }
-        res.cookie("token", token, {
+        res.cookie("token", tokenAccess, {
             maxAge: 24 * 60 * 60 * 1000,
             httpOnly: true,
+            secure: true,
+            sameSite: "None",
         }); //24h
-        return res.json({ token });
+        return res.json({ token, id: user.id, role: user.role });
     }
 
     async logout(req, res, next) {
         try {
-            res.clearCookie("token");
+            console.log(JSON.stringify(req.cookies));
+            res.clearCookie("token", {
+                httpOnly: true,
+                secure: true,
+                sameSite: "None",
+            });
             return res.json({ message: "Success" });
         } catch (e) {
             next(ApiError.badRequest(e));
@@ -61,10 +73,15 @@ class AuthController {
     async emailConfirm(req, res, next) {
         const { token } = req.params;
 
-        const { id } = tokenService.validateJWT(token);
-        const user = await User.update({ confirm: true }, { where: { id } });
-        if (!user) return next(ApiError.badRequest("Email not confirm"));
+        const ts = tokenService.validateJWT(token);
+        console.log(ts);
+        if (!ts) return next(ApiError.forbidden("Token is not correct"));
 
+        const user = await User.update(
+            { confirm: true },
+            { where: { id: ts.id } }
+        );
+        if (!user) return next(ApiError.badRequest("Email not confirm"));
         return res.json({ message: "Account verified!" });
     }
 
@@ -90,10 +107,11 @@ class AuthController {
 
         const hashPassword = await bcrypt.hash(password, 12);
 
-        const { id } = tokenService.validateJWT(token);
+        const ts = tokenService.validateJWT(token);
+        if (!ts) return next(ApiError.forbidden("Token is not correct"));
         const user = await User.update(
             { password: hashPassword },
-            { where: { id } }
+            { where: { id: ts.id } }
         );
         if (!user) return next(ApiError.badRequest("Password not reset!"));
 
@@ -101,16 +119,12 @@ class AuthController {
     }
 
     async check(req, res, next) {
-        const token = tokenService.generateJWT(
+        const token = tokenService.generateAccess(
             req.user.id,
             req.user.login,
             req.user.role
         );
-        res.cookie("token", token, {
-            maxAge: 24 * 60 * 60 * 1000,
-            httpOnly: true,
-        }); //24h
-        return res.json({ token });
+        return res.json({ token, id: req.user.id, role: req.user.role });
     }
 }
 

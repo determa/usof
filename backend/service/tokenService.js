@@ -1,9 +1,15 @@
 const jwt = require("jsonwebtoken");
 
 class TokenService {
-    generateJWT(id, login, role) {
-        return jwt.sign({id, login, role}, process.env.SECRET_KEY, {
+    generateAccess(id, login, role) {
+        return jwt.sign({ id, login, role }, process.env.SECRET_KEY, {
             expiresIn: "24h",
+        });
+    }
+
+    generateJWT(id, login, role) {
+        return jwt.sign({ id, login, role }, process.env.SECRET_KEY, {
+            expiresIn: "10s",
         });
     }
 
