@@ -1,0 +1,66 @@
+.post button {
+    width: 80px;
+    height: 35px;
+    background-color: hsl(205, 46%, 92%);
+}
+
+.date {
+    color: rgb(83, 100, 113);
+    font-family: cursive;
+    font-size: 0.8rem;
+}
+
+.categories {
+    display: flex;
+    gap: 10px;
+}
+
+.category {
+    padding: 5px;
+    background-color: hsl(205, 46%, 92%);
+    border-radius: 5px;
+    font-family: cursive;
+    font-size: 0.85rem;
+}
+
+.post__content {
+    min-height: 80px;
+    overflow-wrap: anywhere;
+}
+
+.post__buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.post__create {
+    display: flex;
+    margin-bottom: 25px;
+    justify-content: center;
+}
+
+.post__create .link {
+    height: 30px;
+    width: 120px;
+    display: flex;
+    background-color: hsl(205, 46%, 92%);
+    border: 1px solid lightslategrey;
+    text-decoration: none;
+    color: black;
+    font-weight: 700;
+    justify-content: center;
+    align-items: center;
+}
+
+.post__fl_aic {
+    display: flex;
+    gap: 30px;
+    height: 100%;
+}
+
+.create_post_form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}

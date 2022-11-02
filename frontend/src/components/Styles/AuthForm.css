@@ -1,0 +1,76 @@
+.auth form {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: sans-serif;
+    border: 1px solid lightgray;
+    padding: 30px;
+    border-radius: 15px;
+}
+
+.login-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #FFFFFF;
+}
+
+.input-section {
+    margin: 0px 0px 12px;
+    display: flex;
+    align-items: center;
+}
+
+.input-area {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.btn {
+    width: 100%;
+    padding: 7px;
+    background-color: #5b86cc;
+    box-shadow: 0 4px 9px -4px #3b71ca;
+    color: #fff;
+    border: 1px solid #ddd;
+    text-transform: uppercase;
+    border-radius: 5px;
+    transition: ease-in 0.2s;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #3b71ca;
+}
+
+.question {
+    display: inline-block;
+    color: #333;
+    font-size: 12px;
+}
+
+.reg-btn {
+    color: #333;
+    margin-left: 5px;
+    font-size: 12px;
+}
+
+.question-box {
+    text-align: center;
+    margin-top: 7px;
+}
+
+.hidden {
+    display: none;
+}
+
+#error-box {
+    width: 100%;
+    text-align: center;
+    color: rgb(171, 0, 0);
+}

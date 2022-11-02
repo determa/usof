@@ -1,0 +1,87 @@
+.df {
+    display: flex;
+}
+
+
+.fd_col {
+    flex-direction: column;
+}
+
+.jc_c {
+    justify-content: center;
+}
+
+.jc_sb {
+    justify-content: space-between;
+}
+
+.App {
+    width: 100%;
+}
+
+.container {
+    padding: 25px;
+}
+
+.block {
+    display: flex;
+    gap: 15px;
+    border: 1px solid lightgray;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    padding: 25px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+.block__own {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.short_info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.df_fww {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.likes {
+    font-size: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.like_item {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    border-radius: 50%;
+    background: #d3d3d375;
+    justify-content: center;
+    align-items: center;
+}
+
+.like_item:hover {
+    background: #d3d3d3b2;
+}
+
+.like_item:active {
+    background: #d3d3d3;
+}

@@ -1,0 +1,7 @@
+.category__item:hover {
+    background-color: rgba(165, 42, 42, 0.395);
+}
+
+.category__item:active {
+    background-color: rgba(165, 42, 42, 0.701);
+}

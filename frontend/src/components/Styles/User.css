@@ -1,0 +1,35 @@
+.post__fl_aic .user__info {
+    flex-direction: column;
+}
+
+.user__info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user__info_big .user__img {
+    width: 100px;
+    height: 100px;
+}
+
+.user__img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1px lightgray solid;
+}
+
+.user__info_role {
+    text-transform: lowercase;
+    font-family: cursive;
+    font-size: 0.9rem;
+}
+
+.user__big_img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 1px lightgray solid;
+}
+
