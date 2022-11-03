@@ -15,6 +15,10 @@
     justify-content: space-between;
 }
 
+.jc_sa {
+    justify-content: space-around;
+}
+
 .App {
     width: 100%;
 }
@@ -63,19 +67,21 @@ a {
     font-size: 25px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    gap: 30px;
 }
 
 .like_item {
-    width: 35px;
-    height: 35px;
+    width: 60px;
+    height: 30px;
     display: flex;
-    border-radius: 50%;
-    background: #d3d3d375;
+    border-radius: 10px;
+    border: 1px solid lightgray;
+    gap: 8px;
     justify-content: center;
     align-items: center;
+    font-size: 23px;
 }
 
 .like_item:hover {
@@ -84,4 +90,23 @@ a {
 
 .like_item:active {
     background: #d3d3d3;
+}
+
+.btn {
+    height: 30px;
+    width: 75px;
+    display: flex;
+    background-color: hsl(205, 46%, 92%);
+    border: 1px solid lightslategrey;
+    color: black;
+    font-weight: 700;
+    justify-content: center;
+    align-items: center;
+    font-family: monospace;
+}
+
+.logo {
+    font-weight: 700;
+    font-family: cursive;
+    font-size: 1.3rem;
 }

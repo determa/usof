@@ -1,6 +1,7 @@
 import React from "react";
 import { API } from "../services/ApiService";
 import getFormattedDate from "../services/getFormatDate";
+import { CommentLikes } from "./Likes";
 import UserInfo from "./UserInfo";
 
 function Comments({ postId }) {
@@ -27,6 +28,9 @@ function Comment({ comment }) {
                 )}
                 <div className="short_info">
                     <p>{comment.content}</p>
+                    <div className="df_fww">
+                        <CommentLikes comment={comment} />
+                    </div>
                     <div className="df jc_sb">
                         <span className="date">
                             {getFormattedDate(comment.createdAt)}

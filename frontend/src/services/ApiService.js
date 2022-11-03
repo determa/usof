@@ -219,5 +219,28 @@ export const API = createApi({
             }),
             invalidatesTags: ["Like", "User"],
         }),
+
+        // commentLikes
+        getCommentLikes: build.query({
+            query: (id) => ({
+                url: `/comments/${id}/like`,
+            }),
+            providesTags: (result) => [{ type: "Like" }],
+        }),
+        addCommentLike: build.mutation({
+            query: ({ id, type }) => ({
+                url: `/comments/${id}/like`,
+                method: "POST",
+                body: { type: type },
+            }),
+            invalidatesTags: ["Like", "User"],
+        }),
+        deleteCommentLike: build.mutation({
+            query: ({ data }) => ({
+                url: `/comments/${data.id}/like`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Like", "User"],
+        }),
     }),
 });

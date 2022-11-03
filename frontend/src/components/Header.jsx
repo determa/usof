@@ -20,6 +20,11 @@ const Header = () => {
             <nav>
                 <ul>
                     <li>
+                        <Link className="logo" to="/posts">
+                            usoff
+                        </Link>
+                    </li>
+                    <li>
                         <Link to="/posts">Posts Page</Link>
                     </li>
                     <li>

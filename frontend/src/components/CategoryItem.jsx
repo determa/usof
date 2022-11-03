@@ -24,7 +24,14 @@ const CategoryItem = ({ category }) => {
             style={{ width: "90px" }}
             onClick={handleRemove}
         >
-            <span style={{ overflowWrap: "anywhere" }}>{category.title}</span>
+            <span
+                style={{
+                    overflowWrap: "anywhere",
+                    borderBottom: "1px lightgray solid",
+                }}
+            >
+                {category.title}
+            </span>
             <span style={{ overflowWrap: "anywhere" }}>
                 {category.description}
             </span>

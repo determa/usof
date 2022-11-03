@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import getFormattedDate from "../services/getFormatDate";
-import Likes from "./Likes";
+import { PostLikes } from "./Likes";
 import UserInfo from "./UserInfo";
 
 const PostItem = ({ post }) => {
@@ -25,7 +25,7 @@ const PostItem = ({ post }) => {
                 </div>
             </div>
             <div className="likes">
-                <Likes post={post} />
+                <PostLikes post={post} />
             </div>
         </div>
     );

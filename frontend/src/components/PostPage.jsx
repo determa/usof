@@ -20,8 +20,10 @@ const PostPage = () => {
 
     const handleRemove = async (e) => {
         e.stopPropagation();
-        let res = await deletePost(post);
-        if (res.data) navigate("posts");
+        if (window.confirm(`Are you sure?`)) {
+            let res = await deletePost(post);
+            if (res.data) navigate("posts");
+        }
     };
 
     const handleUpdate = async (e) => {
@@ -29,12 +31,14 @@ const PostPage = () => {
         post.categories.forEach((value) => {
             arr.push(value.id);
         });
-        const content = prompt() || "";
-        let res = await updatePost({
-            id: id,
-            content: content,
-            categories: arr,
-        });
+        const content = prompt() || null;
+        if (content != null) {
+            await updatePost({
+                id: id,
+                content: content,
+                categories: arr,
+            });
+        }
     };
 
     return (
@@ -72,8 +76,12 @@ const PostPage = () => {
                         </span>
                         {isAuth ? (
                             <div className="post__buttons">
-                                <button onClick={handleRemove}>Delete</button>
-                                <button onClick={handleUpdate}>Update</button>
+                                <button className="btn" onClick={handleRemove}>
+                                    Delete
+                                </button>
+                                <button className="btn" onClick={handleUpdate}>
+                                    Update
+                                </button>
                             </div>
                         ) : (
                             <></>

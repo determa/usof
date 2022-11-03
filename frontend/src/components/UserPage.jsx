@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { API } from "../services/ApiService";
+import getFormattedDate from "../services/getFormatDate";
 import "./Styles/Post.css";
 import UserInfo from "./UserInfo";
 
@@ -15,8 +16,11 @@ const UserPage = () => {
 
     const handleRemove = async (e) => {
         e.stopPropagation();
-        let res = await deleteUser(data);
-        if (res.data) navigate("users");
+
+        if (role === "ADMIN" && window.confirm(`Are you sure?`)) {
+            let res = await deleteUser(data);
+            if (res.data) navigate("users");
+        }
     };
 
     return (
@@ -26,7 +30,24 @@ const UserPage = () => {
                     {<UserInfo userId={id} />}
                     {role === "ADMIN" ? (
                         <>
-                            <button onClick={handleRemove}>Delete</button>
+                            {data && (
+                                <>
+                                    <span className="date">
+                                        created:{" "}
+                                        {getFormattedDate(data.createdAt)}
+                                    </span>
+                                    <span className="date">
+                                        email: {data.confirm ? "" : "not "}
+                                        confirmed
+                                    </span>
+                                </>
+                            )}
+                            <div className="df jc_sa App">
+                                <button className="btn" onClick={handleRemove}>
+                                    Delete
+                                </button>
+                                <button className="btn">update</button>
+                            </div>
                             <span style={{ color: "red" }}>
                                 {deleteError && deleteError.data.message}
                             </span>
